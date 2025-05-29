@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protected Content Example</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .protected-content {
+            /* Disable text selection */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            
+            /* Disable highlighting */
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+            
+            /* Additional protection */
+            -khtml-user-select: none;
+            -o-user-select: none;
+            
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #764ba2;
+            margin: 20px 0;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .normal-text {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e8;
+            border-radius: 8px;
+            color: #2d5a2d;
+        }
+
+        /* Prevent drag and drop */
+        .protected-content * {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+        }
+
+        /* Hide selection even if it somehow occurs */
+        .protected-content::selection {
+            background: transparent;
+        }
+
+        .protected-content::-moz-selection {
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Protected Content Demo</h1>
+            <p>This page demonstrates various text protection techniques</p>
+        </div>
+
+        <div class="protected-content" id="protectedText">
+            <h3>🚫 This text is protected!</h3>
+            <p>This content uses multiple protection methods:</p>
+            <ul>
+                <li>CSS user-select: none to disable text selection</li>
+                <li>JavaScript to block right-click context menu</li>
+                <li>Keyboard shortcut prevention (Ctrl+C, Ctrl+A, F12, etc.)</li>
+                <li>Drag and drop disabled</li>
+                <li>Developer tools access restricted</li>
+            </ul>
+            <p><strong>Try to:</strong></p>
+            <ul>
+                <li>Select this text with your mouse</li>
+                <li>Right-click to open context menu</li>
+                <li>Use Ctrl+C to copy</li>
+                <li>Use Ctrl+A to select all</li>
+                <li>Press F12 to open developer tools</li>
+            </ul>
+            <p><em>None of these actions should work on this protected section!</em></p>
+        </div>
+
+        <div class="warning">
+            ⚠️ Content Protection Active - Copying and Selection Disabled
+        </div>
+
+        <div class="normal-text">
+            <h4>✅ Normal text section</h4>
+            <p>This text is NOT protected - you can freely select, copy, and interact with it normally. This demonstrates the difference between protected and unprotected content on the same page.</p>
+        </div>
+    </div>
+
+    <script>
+        // Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            showAlert('Right-click is disabled!');
+            return false;
+        });
+
+        // Disable text selection via mouse events
+        document.addEventListener('selectstart', function(e) {
+            if (e.target.closest('.protected-content')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable drag start
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.closest('.protected-content')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Disable key combinations
+        document.addEventListener('keydown', function(e) {
+            // Disable F12 (Developer Tools)
+            if (e.keyCode === 123) {
+                e.preventDefault();
+                showAlert('Developer Tools access blocked!');
+                return false;
+            }
+            
+            // Disable Ctrl+Shift+I (Developer Tools)
+            if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+                e.preventDefault();
+                showAlert('Developer Tools access blocked!');
+                return false;
+            }
+            
+            // Disable Ctrl+U (View Source)
+            if (e.ctrlKey && e.keyCode === 85) {
+                e.preventDefault();
+                showAlert('View Source blocked!');
+                return false;
+            }
+            
+            // Check if we're in protected content area
+            const activeElement = document.activeElement;
+            const protectedArea = document.querySelector('.protected-content');
+            
+            if (protectedArea && (protectedArea.contains(activeElement) || 
+                e.target.closest('.protected-content'))) {
+                
+                // Disable Ctrl+A (Select All)
+                if (e.ctrlKey && e.keyCode === 65) {
+                    e.preventDefault();
+                    showAlert('Select All blocked in protected area!');
+                    return false;
+                }
+                
+                // Disable Ctrl+C (Copy)
+                if (e.ctrlKey && e.keyCode === 67) {
+                    e.preventDefault();
+                    showAlert('Copy blocked in protected area!');
+                    return false;
+                }
+                
+                // Disable Ctrl+X (Cut)
+                if (e.ctrlKey && e.keyCode === 88) {
+                    e.preventDefault();
+                    showAlert('Cut blocked in protected area!');
+                    return false;
+                }
+                
+                // Disable Ctrl+V (Paste) - just for completeness
+                if (e.ctrlKey && e.keyCode === 86) {
+                    e.preventDefault();
+                    showAlert('Paste blocked in protected area!');
+                    return false;
+                }
+            }
+        });
+
+        // Show alert function with custom styling
+        function showAlert(message) {
+            // Create a temporary alert div
+            const alertDiv = document.createElement('div');
+            alertDiv.textContent = message;
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff4757;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                font-weight: bold;
+                z-index: 10000;
+                box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // Add animation keyframes
+            if (!document.querySelector('#alertAnimation')) {
+                const style = document.createElement('style');
+                style.id = 'alertAnimation';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(alertDiv);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+
+        // Additional protection: Clear clipboard if somehow content gets copied
+        document.addEventListener('copy', function(e) {
+            const selection = window.getSelection();
+            if (selection.toString() && 
+                document.querySelector('.protected-content').contains(selection.anchorNode)) {
+                e.clipboardData.setData('text/plain', '');
+                e.preventDefault();
+                showAlert('Copy operation blocked!');
+            }
+        });
+
+        // Disable print for protected content (optional)
+        window.addEventListener('beforeprint', function(e) {
+            showAlert('Printing blocked for protected content!');
+            e.preventDefault();
+            return false;
+        });
+
+        // Basic developer tools detection (can be bypassed but adds another layer)
+        let devtools = {open: false, orientation: null};
+        
+        setInterval(function() {
+            if (window.outerHeight - window.innerHeight > 200 || 
+                window.outerWidth - window.innerWidth > 200) {
+                if (!devtools.open) {
+                    devtools.open = true;
+                    showAlert('Developer Tools detected and blocked!');
+                    // You could redirect or take other actions here
+                }
+            } else {
+                devtools.open = false;
+            }
+        }, 500);
+    </script>
+</body>
+</html>
